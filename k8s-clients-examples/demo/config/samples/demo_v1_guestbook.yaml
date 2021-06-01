@@ -1,0 +1,7 @@
+apiVersion: demo.walk1ng.io/v1
+kind: GuestBook
+metadata:
+  name: guestbook-demo
+spec:
+  # Add fields here
+  foo: bar2000

@@ -1,0 +1,6 @@
+apiVersion: demo.walk1ng.io/v1
+kind: GuestBook
+metadata:
+  name: gb2020
+spec:
+  foo: hello2020

@@ -1,0 +1,7 @@
+domain: walk1ng.io
+repo: walk1ng.io/demo
+resources:
+- group: demo
+  kind: GuestBook
+  version: v1
+version: "2"
