@@ -6,5 +6,5 @@ k8s-clients-examples
 2. Generate clientset/informers/listers for the CRD
 ## /democlient
 3. Demo usage of typed client
-4. Demo usage of untyped client
+4. Demo usage of dynamic client
 
