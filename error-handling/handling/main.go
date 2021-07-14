@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 // 一次旅游
@@ -48,21 +49,26 @@ type MyTour struct {
 
 func (mt MyTour) Enter() error {
 	fmt.Printf("%s enter zoo\n", mt.Name)
+	time.Sleep(time.Second)
 	return nil
 }
 
 func (mt MyTour) VisitPanda(panda *Panda) error {
 	fmt.Printf("%s visit panda\n", mt.Name)
-	return nil
+	time.Sleep(time.Second)
+	return fmt.Errorf("panda is missing")
 }
 
 func (mt MyTour) VisitTiger(tiger *Tiger) error {
 	fmt.Printf("%s visit tiger\n", mt.Name)
-	return fmt.Errorf("panda is missing")
+	time.Sleep(time.Second)
+	return nil
+
 }
 
 func (mt MyTour) Leave() error {
 	fmt.Printf("%s leave zoo\n", mt.Name)
+	time.Sleep(time.Second)
 	return nil
 }
 
