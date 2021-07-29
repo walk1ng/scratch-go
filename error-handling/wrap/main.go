@@ -77,7 +77,7 @@ func searchToy(ToyName string) error {
 	if len(ToyName) > 10 {
 		return errors.Wrapf(ErrorToyNotFound, "Toy name is %s", ToyName)
 	} else if len(ToyName) > 8 {
-		return errors.Wrapf(ErrorToyHasBeenBorrowed, "Toy name is %s", ToyName)
+		return errors.WithMessagef(ErrorToyHasBeenBorrowed, "Toy name is %s", ToyName)
 	}
 
 	return nil
