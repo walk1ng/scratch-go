@@ -1,0 +1,7 @@
+domain: walk1ng.dev
+repo: guestbook-redis
+resources:
+- group: webapp
+  kind: GuestBook
+  version: v1
+version: "2"
