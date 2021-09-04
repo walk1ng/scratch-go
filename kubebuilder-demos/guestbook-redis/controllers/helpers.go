@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"context"
 	"fmt"
 	webappv1 "guestbook-redis/api/v1"
 
@@ -10,6 +11,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 )
 
 type redisRole string
@@ -269,4 +272,23 @@ func (r *GuestBookReconciler) desiredService(book webappv1.GuestBook) (*corev1.S
 	}
 
 	return svc, nil
+}
+
+func (r *GuestBookReconciler) booksUsingRedis(obj handler.MapObject) []ctrl.Request {
+	listOptions := []client.ListOption{
+		client.MatchingField(".spec.redisName", obj.Meta.GetName()),
+		client.InNamespace(obj.Meta.GetNamespace()),
+	}
+
+	var bookList webappv1.GuestBookList
+	if err := r.List(context.Background(), &bookList, listOptions...); err != nil {
+		return nil
+	}
+
+	res := make([]ctrl.Request, len(bookList.Items))
+	for i, book := range bookList.Items {
+		res[i].Name = book.GetName()
+		res[i].Namespace = book.GetNamespace()
+	}
+	return res
 }
