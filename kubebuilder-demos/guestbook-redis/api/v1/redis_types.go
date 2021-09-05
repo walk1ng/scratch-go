@@ -29,7 +29,6 @@ type RedisSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	// +optional
-	// +kubebuilder:default=1
 	// +kubebuilder:validation:Minimum=0
 
 	// the number of follower redis instance to run

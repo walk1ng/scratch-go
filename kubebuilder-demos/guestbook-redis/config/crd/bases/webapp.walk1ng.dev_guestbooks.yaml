@@ -46,7 +46,6 @@ spec:
             frontend:
               properties:
                 replicas:
-                  default: 1
                   format: int32
                   minimum: 0
                   type: integer
@@ -78,7 +77,6 @@ spec:
                       type: object
                   type: object
                 servingPort:
-                  default: 8080
                   format: int32
                   type: integer
               type: object

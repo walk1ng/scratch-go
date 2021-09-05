@@ -47,7 +47,6 @@ spec:
           description: RedisSpec defines the desired state of Redis
           properties:
             followerReplicas:
-              default: 1
               description: the number of follower redis instance to run
               format: int32
               minimum: 0

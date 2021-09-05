@@ -64,8 +64,8 @@ func (r *RedisReconciler) leaderDeployment(redis webappv1.Redis) (*appsv1.Deploy
 							},
 							Resources: corev1.ResourceRequirements{
 								Requests: corev1.ResourceList{
-									corev1.ResourceCPU:    resource.MustParse("100m"),
-									corev1.ResourceMemory: resource.MustParse("100Mi"),
+									corev1.ResourceCPU:    *resource.NewMilliQuantity(100, resource.DecimalSI),
+									corev1.ResourceMemory: *resource.NewMilliQuantity(100000, resource.BinarySI),
 								},
 							},
 							ImagePullPolicy: corev1.PullIfNotPresent,
@@ -123,8 +123,8 @@ func (r *RedisReconciler) followerDeployment(redis webappv1.Redis) (*appsv1.Depl
 							},
 							Resources: corev1.ResourceRequirements{
 								Requests: corev1.ResourceList{
-									corev1.ResourceCPU:    resource.MustParse("100m"),
-									corev1.ResourceMemory: resource.MustParse("100Mi"),
+									corev1.ResourceCPU:    *resource.NewMilliQuantity(100, resource.DecimalSI),
+									corev1.ResourceMemory: *resource.NewMilliQuantity(100000, resource.BinarySI),
 								},
 							},
 							ImagePullPolicy: corev1.PullIfNotPresent,

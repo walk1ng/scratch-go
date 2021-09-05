@@ -35,7 +35,6 @@ type GuestBookSpec struct {
 
 type FrontendSpec struct {
 	// +optional
-	// +kubebuilder:default=1
 	// +kubebuilder:validation:Minimum=0
 	Replicas *int32 `json:"replicas,omitempty"`
 
@@ -43,7 +42,6 @@ type FrontendSpec struct {
 	Resources corev1.ResourceRequirements `json:"resources"`
 
 	// +optional
-	// +kubebuilder:default=8080
 	ServingPort int32 `json:"servingPort"`
 }
 
