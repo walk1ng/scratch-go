@@ -29,7 +29,7 @@ func (r *RedisReconciler) leaderDeployment(redis webappv1.Redis) (*appsv1.Deploy
 	deploy := &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Deployment",
-			APIVersion: appsv1.SchemeGroupVersion.Version,
+			APIVersion: appsv1.SchemeGroupVersion.String(),
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-%s", redis.Name, leader),
@@ -88,7 +88,7 @@ func (r *RedisReconciler) followerDeployment(redis webappv1.Redis) (*appsv1.Depl
 	deploy := &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Deployment",
-			APIVersion: appsv1.SchemeGroupVersion.Version,
+			APIVersion: appsv1.SchemeGroupVersion.String(),
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("%s-%s", redis.Name, follower),
@@ -147,7 +147,7 @@ func (r *RedisReconciler) desiredService(redis webappv1.Redis, role redisRole) (
 	svc := &corev1.Service{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Service",
-			APIVersion: corev1.SchemeGroupVersion.Version,
+			APIVersion: corev1.SchemeGroupVersion.String(),
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      redis.Name + string(role),
@@ -177,7 +177,7 @@ func (r *GuestBookReconciler) desiredDeployment(book webappv1.GuestBook, redis w
 	deploy := &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Deployment",
-			APIVersion: appsv1.SchemeGroupVersion.Version,
+			APIVersion: appsv1.SchemeGroupVersion.String(),
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      book.Name,
@@ -244,7 +244,7 @@ func (r *GuestBookReconciler) desiredService(book webappv1.GuestBook) (*corev1.S
 	svc := &corev1.Service{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Service",
-			APIVersion: corev1.SchemeGroupVersion.Version,
+			APIVersion: corev1.SchemeGroupVersion.String(),
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      book.Name,
