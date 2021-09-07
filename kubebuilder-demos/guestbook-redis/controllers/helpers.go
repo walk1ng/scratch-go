@@ -154,7 +154,9 @@ func (r *RedisReconciler) desiredService(redis webappv1.Redis, role redisRole) (
 			Namespace: redis.Namespace,
 		},
 		Spec: corev1.ServiceSpec{
-			Ports: []corev1.ServicePort{},
+			Ports: []corev1.ServicePort{
+				{Name: "redis", Port: 6379, Protocol: "TCP", TargetPort: intstr.FromString("redis")},
+			},
 			Selector: map[string]string{
 				"redis": redis.Name,
 				"role":  string(role),
@@ -275,6 +277,9 @@ func (r *GuestBookReconciler) desiredService(book webappv1.GuestBook) (*corev1.S
 }
 
 func (r *GuestBookReconciler) booksUsingRedis(obj handler.MapObject) []ctrl.Request {
+
+	r.Log.Info("object changes watched in object", "kind", obj.Object.GetObjectKind().GroupVersionKind().Kind)
+
 	listOptions := []client.ListOption{
 		client.MatchingField(".spec.redisName", obj.Meta.GetName()),
 		client.InNamespace(obj.Meta.GetNamespace()),
