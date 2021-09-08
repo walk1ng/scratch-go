@@ -1,13 +1,13 @@
 apiVersion: webapp.walk1ng.dev/v1
 kind: GuestBook
 metadata:
-  name: guestbook-sample
+  name: guestbook-sample-1
   namespace: myguestbook
 spec:
   # Add fields here
   redisName: redis-sample
   frontend: 
-    replicas: 1
+    replicas: 2
     resources:
       requests:
         cpu: 100m

@@ -278,15 +278,16 @@ func (r *GuestBookReconciler) desiredService(book webappv1.GuestBook) (*corev1.S
 
 func (r *GuestBookReconciler) booksUsingRedis(obj handler.MapObject) []ctrl.Request {
 
-	r.Log.Info("object changes watched in object", "kind", obj.Object.GetObjectKind().GroupVersionKind().Kind)
+	r.Log.Info("object changes watched", "namespace", obj.Meta.GetNamespace(), "name", obj.Meta.GetName())
 
 	listOptions := []client.ListOption{
-		client.MatchingField(".spec.redisName", obj.Meta.GetName()),
+		client.MatchingFields{".spec.redisName": obj.Meta.GetName()},
 		client.InNamespace(obj.Meta.GetNamespace()),
 	}
 
 	var bookList webappv1.GuestBookList
 	if err := r.List(context.Background(), &bookList, listOptions...); err != nil {
+		r.Log.Error(err, "failed to list effected GuestBookList", "listOptions", listOptions)
 		return nil
 	}
 
@@ -294,6 +295,7 @@ func (r *GuestBookReconciler) booksUsingRedis(obj handler.MapObject) []ctrl.Requ
 	for i, book := range bookList.Items {
 		res[i].Name = book.GetName()
 		res[i].Namespace = book.GetNamespace()
+		r.Log.Info("new request", "namespacedName", res[i].NamespacedName)
 	}
 	return res
 }
