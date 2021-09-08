@@ -97,7 +97,7 @@ func (r *GuestBookReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 func (r *GuestBookReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	mgr.GetFieldIndexer().IndexField(&webappv1.GuestBook{},
-		".spec.RedisName", func(o runtime.Object) []string {
+		".spec.redisName", func(o runtime.Object) []string {
 			redisName := o.(*webappv1.GuestBook).Spec.RedisName
 			if redisName == "" {
 				return nil
