@@ -4,11 +4,14 @@ import (
 	"context"
 	"fmt"
 	webappv1 "guestbook-redis/api/v1"
+	"net"
+	"strconv"
 
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -264,7 +267,7 @@ func (r *GuestBookReconciler) desiredService(book webappv1.GuestBook) (*corev1.S
 			Selector: map[string]string{
 				"guestbook": book.Name,
 			},
-			Type: corev1.ServiceTypeClusterIP,
+			Type: corev1.ServiceTypeNodePort,
 		},
 	}
 
@@ -298,4 +301,46 @@ func (r *GuestBookReconciler) booksUsingRedis(obj handler.MapObject) []ctrl.Requ
 		r.Log.Info("new request", "namespacedName", res[i].NamespacedName)
 	}
 	return res
+}
+
+func (r *GuestBookReconciler) getService(book webappv1.GuestBook) (*corev1.Service, error) {
+	var svc corev1.Service
+	if err := r.Get(context.Background(), types.NamespacedName{
+		Namespace: book.Namespace,
+		Name:      book.Name,
+	}, &svc); err != nil {
+		return nil, err
+	}
+
+	return &svc, nil
+}
+
+func (r *GuestBookReconciler) urlForService(nodePort int32) string {
+	port := strconv.Itoa(int(nodePort))
+	return fmt.Sprintf("http://%s", net.JoinHostPort(r.getNodeAddress(), port))
+}
+
+func (r *GuestBookReconciler) getNodeAddress() string {
+	var list corev1.NodeList
+	if err := r.List(context.TODO(), &list, &client.ListOptions{}); err != nil {
+		return ""
+	}
+
+	var addr string
+
+	for _, address := range list.Items[0].Status.Addresses {
+		if address.Type == corev1.NodeInternalIP {
+			addr = address.Address
+		}
+	}
+
+	if addr == "" {
+		for _, address := range list.Items[0].Status.Addresses {
+			if address.Type == corev1.NodeHostName {
+				addr = address.Address
+			}
+		}
+	}
+
+	return addr
 }

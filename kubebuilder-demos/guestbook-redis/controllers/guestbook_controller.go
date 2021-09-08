@@ -85,7 +85,15 @@ func (r *GuestBookReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	// update guestbook status
-	book.Status.URL = "TODO"
+	gbSvc, err := r.getService(book)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	book.Status.URL = r.urlForService(gbSvc.Spec.Ports[0].NodePort)
+	if err != nil {
+		book.Status.URL = "UNKNOWN"
+	}
+
 	err = r.Status().Update(ctx, &book)
 	if err != nil {
 		return ctrl.Result{}, err
