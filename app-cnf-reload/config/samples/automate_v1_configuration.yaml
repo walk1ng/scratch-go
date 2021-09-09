@@ -1,0 +1,7 @@
+apiVersion: automate.walk1ng.dev/v1
+kind: Configuration
+metadata:
+  name: configuration-sample
+spec:
+  # Add fields here
+  replicas: 1

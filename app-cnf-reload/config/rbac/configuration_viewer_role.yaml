@@ -1,0 +1,20 @@
+# permissions for end users to view configurations.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: configuration-viewer-role
+rules:
+- apiGroups:
+  - automate.walk1ng.dev
+  resources:
+  - configurations
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - automate.walk1ng.dev
+  resources:
+  - configurations/status
+  verbs:
+  - get

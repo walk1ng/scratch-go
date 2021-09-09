@@ -1,0 +1,24 @@
+# permissions for end users to edit applications.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: application-editor-role
+rules:
+- apiGroups:
+  - automate.walk1ng.dev
+  resources:
+  - applications
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - automate.walk1ng.dev
+  resources:
+  - applications/status
+  verbs:
+  - get
