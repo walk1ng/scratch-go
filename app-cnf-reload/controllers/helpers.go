@@ -93,3 +93,24 @@ func (r *ApplicationReconciler) applicationUsingConfiguration(o client.Object) [
 	}
 	return requests
 }
+
+func (r *ConfigurationReconciler) configurationsUsedByApplication(o client.Object) []reconcile.Request {
+	r.Log.Info("watch object changed", "namespace", o.GetNamespace(), "name", o.GetName())
+
+	confKey := types.NamespacedName{
+		Namespace: o.GetNamespace(),
+		Name:      o.(*automatev1.Application).Spec.ConfigurationName,
+	}
+
+	var conf automatev1.Configuration
+	if err := r.Get(context.Background(), confKey, &conf); err != nil {
+		if client.IgnoreNotFound(err) != nil {
+			r.Log.Error(err, "failed to get configuration effected by the change", "namespace", confKey.Namespace, "name", confKey.Name)
+		}
+		return nil
+	}
+
+	r.Log.Info("enqueue request", "namespace", confKey.Namespace, "name", confKey.Name)
+	return []reconcile.Request{{NamespacedName: confKey}}
+
+}

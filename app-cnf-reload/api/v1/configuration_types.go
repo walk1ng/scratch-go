@@ -38,11 +38,14 @@ type ConfigurationSpec struct {
 type ConfigurationStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+
+	Applications string `json:"applications,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// +kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 // +kubebuilder:printcolumn:JSONPath=".spec.replicas",name="Desired",type="integer"
+// +kubebuilder:printcolumn:JSONPath=".status.applications",name="Apps",type="string"
 
 // Configuration is the Schema for the configurations API
 type Configuration struct {

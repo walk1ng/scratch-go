@@ -18,13 +18,15 @@ package controllers
 
 import (
 	"context"
+	"strings"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	apiv1 "app-cnf-reload/api/v1"
 	automatev1 "app-cnf-reload/api/v1"
 )
 
@@ -53,9 +55,33 @@ func (r *ConfigurationReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 
 	log.Info("reconciling Configuration")
 	// your logic here
-	var conf apiv1.Configuration
+	var conf automatev1.Configuration
 	if err := r.Get(ctx, req.NamespacedName, &conf); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	// fetch applications which refer the configuration
+	var appList automatev1.ApplicationList
+	listOpts := []client.ListOption{client.InNamespace(conf.Namespace), client.MatchingFields{".spec.configurationName": conf.Name}}
+	err := r.List(ctx, &appList, listOpts...)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	var apps []string
+
+	if len(appList.Items) == 0 {
+		apps = []string{}
+	} else {
+		for _, app := range appList.Items {
+			apps = append(apps, app.Name)
+		}
+	}
+
+	conf.Status.Applications = strings.Join(apps, ",")
+	err = r.Status().Update(ctx, &conf)
+	if err != nil {
+		return ctrl.Result{}, err
 	}
 
 	log.Info("reconciled Configuration")
@@ -66,5 +92,7 @@ func (r *ConfigurationReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 func (r *ConfigurationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&automatev1.Configuration{}).
+		Watches(&source.Kind{Type: &automatev1.Application{}},
+			handler.EnqueueRequestsFromMapFunc(r.configurationsUsedByApplication)).
 		Complete(r)
 }
