@@ -39,7 +39,7 @@ type ApplicationStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-// +kubebuilder:printcolumn:JSONPath=".spec.configurationName",name="Conf",type="string"
+//+kubebuilder:printcolumn:JSONPath=".spec.configurationName",name="Conf",type="string"
 
 // Application is the Schema for the applications API
 type Application struct {
