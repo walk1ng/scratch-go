@@ -79,17 +79,19 @@ func main() {
 	}
 
 	if err = (&controllers.NiceServiceReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("NiceService"),
-		Scheme: mgr.GetScheme(),
+		Client:  mgr.GetClient(),
+		Log:     ctrl.Log.WithName("controllers").WithName("NiceService"),
+		Scheme:  mgr.GetScheme(),
+		Eventer: mgr.GetEventRecorderFor("niceservice-controller"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "NiceService")
 		os.Exit(1)
 	}
 	if err = (&controllers.NicePodReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("NicePod"),
-		Scheme: mgr.GetScheme(),
+		Client:  mgr.GetClient(),
+		Log:     ctrl.Log.WithName("controllers").WithName("NicePod"),
+		Scheme:  mgr.GetScheme(),
+		Eventer: mgr.GetEventRecorderFor("nicepod-controller"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "NicePod")
 		os.Exit(1)

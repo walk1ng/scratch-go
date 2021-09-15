@@ -40,7 +40,6 @@ type NiceServiceStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
-//+kubebuilder:resource:scope=Cluster
 
 // NiceService is the Schema for the niceservices API
 type NiceService struct {

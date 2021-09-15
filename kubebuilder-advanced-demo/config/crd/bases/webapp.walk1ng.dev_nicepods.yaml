@@ -14,7 +14,7 @@ spec:
     listKind: NicePodList
     plural: nicepods
     singular: nicepod
-  scope: Cluster
+  scope: Namespaced
   versions:
   - name: v1
     schema:

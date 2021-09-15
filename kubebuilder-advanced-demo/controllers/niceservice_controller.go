@@ -21,6 +21,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -30,13 +31,15 @@ import (
 // NiceServiceReconciler reconciles a NiceService object
 type NiceServiceReconciler struct {
 	client.Client
-	Log    logr.Logger
-	Scheme *runtime.Scheme
+	Log     logr.Logger
+	Scheme  *runtime.Scheme
+	Eventer record.EventRecorder
 }
 
 //+kubebuilder:rbac:groups=webapp.walk1ng.dev,resources=niceservices,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=webapp.walk1ng.dev,resources=niceservices/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=webapp.walk1ng.dev,resources=niceservices/finalizers,verbs=update
+//+kubebuilder:rbac:groups="",resources=events,verbs=get;list;watch;create;update;patch
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -48,10 +51,22 @@ type NiceServiceReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.7.2/pkg/reconcile
 func (r *NiceServiceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = r.Log.WithValues("niceservice", req.NamespacedName)
+	log := r.Log.WithValues("niceservice", req.NamespacedName)
 
+	log.Info("reconciling NiceService")
 	// your logic here
+	var service webappv1.NiceService
+	if err := r.Get(ctx, req.NamespacedName, &service); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+	// record event
+	// Type of this event (Normal, Warning)
+	r.Eventer.Eventf(&service, "Normal", "Reconciling", "Reconciling NiceService %s/%s", req.Namespace, req.Name)
 
+	log.Info("reconciled NiceService")
+	// record event
+	// Type of this event (Normal, Warning)
+	r.Eventer.Eventf(&service, "Normal", "Reconciled", "Reconciled NiceService %s/%s", req.Namespace, req.Name)
 	return ctrl.Result{}, nil
 }
 

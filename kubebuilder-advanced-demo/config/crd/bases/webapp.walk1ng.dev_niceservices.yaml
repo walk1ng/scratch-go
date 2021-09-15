@@ -14,7 +14,7 @@ spec:
     listKind: NiceServiceList
     plural: niceservices
     singular: niceservice
-  scope: Cluster
+  scope: Namespaced
   versions:
   - name: v1
     schema:
