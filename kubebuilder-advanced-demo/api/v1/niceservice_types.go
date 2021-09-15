@@ -28,14 +28,15 @@ type NiceServiceSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of NiceService. Edit niceservice_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	Selector map[string]string `json:"selector"`
 }
 
 // NiceServiceStatus defines the observed state of NiceService
 type NiceServiceStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+
+	EndPoints []string `json:"endPoints"`
 }
 
 //+kubebuilder:object:root=true

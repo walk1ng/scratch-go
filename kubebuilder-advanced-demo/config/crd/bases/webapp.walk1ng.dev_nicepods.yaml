@@ -36,10 +36,10 @@ spec:
           spec:
             description: NicePodSpec defines the desired state of NicePod
             properties:
-              foo:
-                description: Foo is an example field of NicePod. Edit nicepod_types.go
-                  to remove/update
-                type: string
+              labels:
+                additionalProperties:
+                  type: string
+                type: object
             type: object
           status:
             description: NicePodStatus defines the observed state of NicePod

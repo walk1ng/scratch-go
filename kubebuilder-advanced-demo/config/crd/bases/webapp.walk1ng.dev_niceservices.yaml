@@ -36,13 +36,22 @@ spec:
           spec:
             description: NiceServiceSpec defines the desired state of NiceService
             properties:
-              foo:
-                description: Foo is an example field of NiceService. Edit niceservice_types.go
-                  to remove/update
-                type: string
+              selector:
+                additionalProperties:
+                  type: string
+                type: object
+            required:
+            - selector
             type: object
           status:
             description: NiceServiceStatus defines the observed state of NiceService
+            properties:
+              endPoints:
+                items:
+                  type: string
+                type: array
+            required:
+            - endPoints
             type: object
         type: object
     served: true

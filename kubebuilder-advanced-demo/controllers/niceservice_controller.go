@@ -20,10 +20,13 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	webappv1 "kubebuilder-advanced-demo/api/v1"
 )
@@ -54,14 +57,40 @@ func (r *NiceServiceReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	log := r.Log.WithValues("niceservice", req.NamespacedName)
 
 	log.Info("reconciling NiceService")
+
 	// your logic here
 	var service webappv1.NiceService
 	if err := r.Get(ctx, req.NamespacedName, &service); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
+
 	// record event
 	// Type of this event (Normal, Warning)
 	r.Eventer.Eventf(&service, "Normal", "Reconciling", "Reconciling NiceService %s/%s", req.Namespace, req.Name)
+
+	var podList webappv1.NicePodList
+	listOpts := []client.ListOption{
+		client.MatchingLabelsSelector{Selector: labels.SelectorFromSet(service.Spec.Selector)},
+		client.InNamespace(service.GetNamespace()),
+	}
+	err := r.List(ctx, &podList, listOpts...)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	// matching no one nicepods
+	if len(podList.Items) == 0 {
+		return ctrl.Result{}, nil
+	}
+
+	for i, pod := range podList.Items {
+		service.Status.EndPoints[i] = pod.Name
+	}
+
+	err = r.Status().Update(ctx, &service)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
 
 	log.Info("reconciled NiceService")
 	// record event
@@ -74,5 +103,6 @@ func (r *NiceServiceReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 func (r *NiceServiceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&webappv1.NiceService{}).
+		Watches(&source.Kind{Type: &webappv1.NicePod{}}, &handler.EnqueueRequestForObject{}).
 		Complete(r)
 }
