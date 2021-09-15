@@ -1,0 +1,24 @@
+# permissions for end users to edit niceservices.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: niceservice-editor-role
+rules:
+- apiGroups:
+  - webapp.walk1ng.dev
+  resources:
+  - niceservices
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - webapp.walk1ng.dev
+  resources:
+  - niceservices/status
+  verbs:
+  - get

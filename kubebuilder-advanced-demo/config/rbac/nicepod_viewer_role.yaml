@@ -1,0 +1,20 @@
+# permissions for end users to view nicepods.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nicepod-viewer-role
+rules:
+- apiGroups:
+  - webapp.walk1ng.dev
+  resources:
+  - nicepods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - webapp.walk1ng.dev
+  resources:
+  - nicepods/status
+  verbs:
+  - get

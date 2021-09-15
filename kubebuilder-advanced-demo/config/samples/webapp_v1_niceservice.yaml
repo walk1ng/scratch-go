@@ -1,0 +1,7 @@
+apiVersion: webapp.walk1ng.dev/v1
+kind: NiceService
+metadata:
+  name: niceservice-sample
+spec:
+  # Add fields here
+  foo: bar

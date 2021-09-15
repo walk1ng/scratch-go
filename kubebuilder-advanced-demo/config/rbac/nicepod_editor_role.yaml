@@ -1,0 +1,24 @@
+# permissions for end users to edit nicepods.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nicepod-editor-role
+rules:
+- apiGroups:
+  - webapp.walk1ng.dev
+  resources:
+  - nicepods
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - webapp.walk1ng.dev
+  resources:
+  - nicepods/status
+  verbs:
+  - get

@@ -1,0 +1,20 @@
+# permissions for end users to view niceservices.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: niceservice-viewer-role
+rules:
+- apiGroups:
+  - webapp.walk1ng.dev
+  resources:
+  - niceservices
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - webapp.walk1ng.dev
+  resources:
+  - niceservices/status
+  verbs:
+  - get
