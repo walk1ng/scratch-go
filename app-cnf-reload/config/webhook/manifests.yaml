@@ -1,0 +1,58 @@
+
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  creationTimestamp: null
+  name: mutating-webhook-configuration
+webhooks:
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /mutate-automate-walk1ng-dev-v1-configuration
+  failurePolicy: Fail
+  name: mconfiguration.kb.io
+  rules:
+  - apiGroups:
+    - automate.walk1ng.dev
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - configurations
+  sideEffects: None
+
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  creationTimestamp: null
+  name: validating-webhook-configuration
+webhooks:
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    service:
+      name: webhook-service
+      namespace: system
+      path: /validate-automate-walk1ng-dev-v1-configuration
+  failurePolicy: Fail
+  name: vconfiguration.kb.io
+  rules:
+  - apiGroups:
+    - automate.walk1ng.dev
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - configurations
+  sideEffects: None

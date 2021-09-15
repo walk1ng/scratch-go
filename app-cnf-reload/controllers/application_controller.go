@@ -86,6 +86,7 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
+
 	mgr.GetFieldIndexer().IndexField(context.Background(), &automatev1.Application{},
 		".spec.configurationName", func(o client.Object) []string {
 			configurationName := o.(*automatev1.Application).Spec.ConfigurationName
