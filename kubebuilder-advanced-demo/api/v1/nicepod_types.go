@@ -40,6 +40,7 @@ type NicePodStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:resource:scope=Cluster
 
 // NicePod is the Schema for the nicepods API
 type NicePod struct {
