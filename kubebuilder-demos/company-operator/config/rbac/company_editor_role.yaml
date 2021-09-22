@@ -1,0 +1,24 @@
+# permissions for end users to edit companies.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: company-editor-role
+rules:
+- apiGroups:
+  - webapp.walk1ng.dev
+  resources:
+  - companies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - webapp.walk1ng.dev
+  resources:
+  - companies/status
+  verbs:
+  - get

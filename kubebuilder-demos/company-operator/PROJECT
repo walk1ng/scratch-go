@@ -1,0 +1,25 @@
+domain: walk1ng.dev
+layout:
+- go.kubebuilder.io/v3
+projectName: company-operator
+repo: company-operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: walk1ng.dev
+  group: webapp
+  kind: Company
+  path: company-operator/api/v1
+  version: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: walk1ng.dev
+  group: webapp
+  kind: Employee
+  path: company-operator/api/v1
+  version: v1
+version: "3"

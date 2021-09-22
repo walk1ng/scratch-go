@@ -1,0 +1,24 @@
+# permissions for end users to edit employees.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: employee-editor-role
+rules:
+- apiGroups:
+  - webapp.walk1ng.dev
+  resources:
+  - employees
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - webapp.walk1ng.dev
+  resources:
+  - employees/status
+  verbs:
+  - get
