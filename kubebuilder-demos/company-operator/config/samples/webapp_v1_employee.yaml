@@ -6,6 +6,7 @@ spec:
   # Add fields here
   role: engineer
   company: microsoft
+  desiredWorkers: 1
   resources:
     limits:
       cpu: 50m

@@ -20,9 +20,12 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
+	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	webappv1 "company-operator/api/v1"
 )
@@ -48,10 +51,38 @@ type EmployeeReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.7.2/pkg/reconcile
 func (r *EmployeeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = r.Log.WithValues("employee", req.NamespacedName)
+	log := r.Log.WithValues("employee", req.NamespacedName)
+	log.Info("reconciling employee")
 
-	// your logic here
+	var emp webappv1.Employee
+	err := r.Get(ctx, req.NamespacedName, &emp)
+	if err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
 
+	deploy, err := r.desiredDeployment(emp)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	applyOpts := []client.PatchOption{
+		client.ForceOwnership,
+		client.FieldOwner("employee-controller"),
+	}
+	err = r.Patch(ctx, &deploy, client.Apply, applyOpts...)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	err = r.getEmployeeWorkState(ctx, &emp)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+	err = r.Status().Update(ctx, &emp)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	log.Info("reconciled employee")
 	return ctrl.Result{}, nil
 }
 
@@ -59,5 +90,15 @@ func (r *EmployeeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 func (r *EmployeeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&webappv1.Employee{}).
+		/*
+			Employee can watch the desired deployment by two ways:
+			*1 - own the deployment
+				Owns(&appsv1.Deployment{}).
+			*2 - watch the deployment and as owner will be enqueued while events occured on deployments
+				Watches(&source.Kind{Type: &appsv1.Deployment{}}, &handler.EnqueueRequestForOwner{OwnerType: &webappv1.Employee{}, IsController: true}).
+			these two ways can watch the only deploymnents owner by employee rather than all deployments.
+		*/
+		// Owns(&appsv1.Deployment{}).
+		Watches(&source.Kind{Type: &appsv1.Deployment{}}, &handler.EnqueueRequestForOwner{OwnerType: &webappv1.Employee{}, IsController: true}).
 		Complete(r)
 }

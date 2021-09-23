@@ -29,6 +29,14 @@ const (
 	Manager  Role = "manager"
 )
 
+type WorkState string
+
+const (
+	NotStart WorkState = "notStart"
+	Prepare  WorkState = "prepare"
+	Working  WorkState = "working"
+)
+
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
@@ -37,17 +45,22 @@ type EmployeeSpec struct {
 	Role      Role                        `json:"role,omitempty"`
 	Company   string                      `json:"company,omitempty"`
 	Resources corev1.ResourceRequirements `json:"resources,omitempty"`
+	// +kubebuilder:validation:Minimum=1
+	DesiredWorkers int32 `json:"desiredWorkers,omitempty"`
 }
 
 // EmployeeStatus defines the observed state of Employee
 type EmployeeStatus struct {
-	WorkState string `json:"workState,omitempty"`
+	ActualWorkers int32     `json:"actualWorkers,omitempty"`
+	WorkState     WorkState `json:"workState,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 // +kubebuilder:printcolumn:JSONPath=".spec.role",name="Role",type="string"
 // +kubebuilder:printcolumn:JSONPath=".spec.company",name="Company",type="string"
+// +kubebuilder:printcolumn:JSONPath=".spec.desiredWorkers",name="DesiredWorkers",type="integer"
+// +kubebuilder:printcolumn:JSONPath=".status.actualWorkers",name="ActualWorkers",type="integer"
 // +kubebuilder:printcolumn:JSONPath=".status.workState",name="WorkState",type="string"
 
 // Employee is the Schema for the employees API
