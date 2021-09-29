@@ -16,7 +16,17 @@ spec:
     singular: company
   scope: Namespaced
   versions:
-  - name: v1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.city
+      name: City
+      type: string
+    - jsonPath: .spec.address
+      name: Addr
+      type: string
+    - jsonPath: .status.employees
+      name: Employees
+      type: integer
+    name: v1
     schema:
       openAPIV3Schema:
         description: Company is the Schema for the companies API
@@ -36,13 +46,16 @@ spec:
           spec:
             description: CompanySpec defines the desired state of Company
             properties:
-              foo:
-                description: Foo is an example field of Company. Edit company_types.go
-                  to remove/update
+              address:
+                type: string
+              city:
                 type: string
             type: object
           status:
             description: CompanyStatus defines the observed state of Company
+            properties:
+              employees:
+                type: integer
             type: object
         type: object
     served: true

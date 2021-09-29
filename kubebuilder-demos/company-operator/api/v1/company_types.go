@@ -25,21 +25,20 @@ import (
 
 // CompanySpec defines the desired state of Company
 type CompanySpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of Company. Edit company_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	City    string `json:"city,omitempty"`
+	Address string `json:"address,omitempty"`
 }
 
 // CompanyStatus defines the observed state of Company
 type CompanyStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	Employees int `json:"employees,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+// +kubebuilder:printcolumn:JSONPath=".spec.city",name="City",type="string"
+// +kubebuilder:printcolumn:JSONPath=".spec.address",name="Addr",type="string"
+// +kubebuilder:printcolumn:JSONPath=".status.employees",name="Employees",type="integer"
 
 // Company is the Schema for the companies API
 type Company struct {

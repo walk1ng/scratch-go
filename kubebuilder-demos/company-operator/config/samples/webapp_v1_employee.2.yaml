@@ -1,12 +1,12 @@
 apiVersion: webapp.walk1ng.dev/v1
 kind: Employee
 metadata:
-  name: klose
+  name: benjamin
 spec:
   # Add fields here
-  role: engineer
-  company: google
-  desiredWorkers: 2
+  role: manager
+  company: microsoft
+  desiredWorkers: 3
   resources:
     limits:
       cpu: 50m

@@ -88,6 +88,15 @@ func (r *EmployeeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *EmployeeReconciler) SetupWithManager(mgr ctrl.Manager) error {
+
+	mgr.GetFieldIndexer().IndexField(context.Background(), &webappv1.Employee{}, ".spec.company", func(o client.Object) []string {
+		companyName := o.(*webappv1.Employee).Spec.Company
+		if companyName == "" {
+			return nil
+		}
+		return []string{companyName}
+	})
+
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&webappv1.Employee{}).
 		/*

@@ -23,6 +23,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	webappv1 "company-operator/api/v1"
 )
@@ -48,10 +50,33 @@ type CompanyReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.7.2/pkg/reconcile
 func (r *CompanyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = r.Log.WithValues("company", req.NamespacedName)
+	log := r.Log.WithValues("company", req.NamespacedName)
+	log.Info("reconciling company")
 
 	// your logic here
+	var comp webappv1.Company
+	err := r.Get(ctx, req.NamespacedName, &comp)
+	if err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
 
+	var empls webappv1.EmployeeList
+	listOpts := []client.ListOption{
+		client.InNamespace(comp.Namespace),
+		client.MatchingFields{".spec.company": comp.Name},
+	}
+	err = r.List(ctx, &empls, listOpts...)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	comp.Status.Employees = len(empls.Items)
+	err = r.Status().Update(ctx, &comp)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	log.Info("reconciled company")
 	return ctrl.Result{}, nil
 }
 
@@ -59,5 +84,6 @@ func (r *CompanyReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 func (r *CompanyReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&webappv1.Company{}).
+		Watches(&source.Kind{Type: &webappv1.Employee{}}, handler.EnqueueRequestsFromMapFunc(r.companyForEmployees)).
 		Complete(r)
 }

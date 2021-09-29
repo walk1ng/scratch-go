@@ -1,8 +1,8 @@
 apiVersion: webapp.walk1ng.dev/v1
 kind: Company
 metadata:
-  name: microsoft
+  name: google
 spec:
   # Add fields here
-  city: shanghai
-  address: zixin road 999
+  city: hongkong
+  address: queue road 666

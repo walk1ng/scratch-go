@@ -8,6 +8,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
 var (
@@ -76,4 +78,19 @@ func (r *EmployeeReconciler) getEmployeeWorkState(ctx context.Context, em *webap
 	em.Status.ActualWorkers = depl.Status.ReadyReplicas
 
 	return nil
+}
+
+func (r *CompanyReconciler) companyForEmployees(o client.Object) []reconcile.Request {
+	empl := o.(*webappv1.Employee)
+
+	var comp webappv1.Company
+	err := r.Get(context.Background(), types.NamespacedName{Namespace: o.GetNamespace(), Name: empl.Spec.Company}, &comp)
+	if err != nil {
+		r.Log.Error(err, "fetch company failed")
+		return nil
+	}
+	return []reconcile.Request{reconcile.Request{NamespacedName: types.NamespacedName{
+		Namespace: comp.Namespace,
+		Name:      comp.Name,
+	}}}
 }
