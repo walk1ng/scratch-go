@@ -27,7 +27,29 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+type OpType int
+
+const (
+	ADD      OpType = 1
+	MINUS    OpType = 2
+	MULTIPLY OpType = 3
+	DIVIDE   OpType = 4
+)
+
+type ErrorHandling int
+
+const (
+	ContinueOnParseError  ErrorHandling = 1
+	ExitOnParseError      ErrorHandling = 2
+	PanicOnParseError     ErrorHandling = 3
+	ReturnOnDividedByZero ErrorHandling = 4
+	PanicOnDividedByZero  ErrorHandling = 5
+)
+
+var (
+	cfgFile       string
+	parseHandling int
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -58,6 +80,8 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.mycal.yaml)")
+
+	rootCmd.PersistentFlags().IntVarP(&parseHandling, "parse_error", "p", int(ContinueOnParseError), "what behavior when parse args error")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
