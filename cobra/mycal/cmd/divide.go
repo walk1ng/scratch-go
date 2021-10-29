@@ -1,6 +1,12 @@
 package cmd
 
-import "github.com/spf13/cobra"
+import (
+	"fmt"
+	"os"
+	"strings"
+
+	"github.com/spf13/cobra"
+)
 
 var (
 	dividedByZeroHandling int
@@ -11,6 +17,9 @@ var divideCmd = &cobra.Command{
 	Short: "Divide subcommand add all passed args",
 
 	Run: func(cmd *cobra.Command, args []string) {
+		nums := convertArgsToFloatSlice(args, ErrorHandling(parseHandling))
+		result := calc(nums, DIVIDE)
+		fmt.Fprintf(os.Stdout, "%s = %.2f\n", strings.Join(args, "/"), result)
 	},
 }
 
