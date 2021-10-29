@@ -47,6 +47,8 @@ func calc(values []float64, opType OpType) float64 {
 				case PanicOnDividedByZero:
 					panic(errors.New("divided by zero"))
 				}
+			} else {
+				result /= values[i]
 			}
 		}
 	}
@@ -73,5 +75,14 @@ func convertArgsToFloatSlice(args []string, errHandling ErrorHandling) []float64
 	}
 
 	fmt.Println("args:", result)
+	return result
+}
+
+func ConvertValuesToStringSlice(values []float64) []string {
+	result := make([]string, 0, len(values))
+	for _, value := range values {
+		result = append(result, strconv.FormatFloat(value, 'g', 30, 64))
+	}
+
 	return result
 }

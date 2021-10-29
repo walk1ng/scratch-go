@@ -19,7 +19,7 @@ var divideCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		nums := convertArgsToFloatSlice(args, ErrorHandling(parseHandling))
 		result := calc(nums, DIVIDE)
-		fmt.Fprintf(os.Stdout, "%s = %.2f\n", strings.Join(args, "/"), result)
+		fmt.Fprintf(os.Stdout, "%s = %.2f\n", strings.Join(ConvertValuesToStringSlice(nums), "/"), result)
 	},
 }
 
