@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admission-webhook
+  namespace: dev
+  labels:
+    app: admission-webhook
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  selector:
+    matchLabels:
+      app: admission-webhook
+  template:
+    metadata:
+      labels:
+        app: admission-webhook
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: ubuntu-dt-04
+      containers:
+      - name: webhook
+        image: walk1ng/admission-webhook:v1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: https
+          containerPort: 443
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - name: certs
+          mountPath: /certs
+          readOnly: true
+        - name: sidecar
+          mountPath: /config
+          readOnly: true
+      volumes:
+      - name: certs
+        secret:
+          secretName: webhook-certs
+      - name: sidecar
+        configMap:
+          name: webhook-sidecar
+      

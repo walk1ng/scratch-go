@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test
+  namespace: dev
+  labels:
+    app: test
+spec:
+  replicas: 3
+  minReadySeconds: 10
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: ubuntu-dt-04
+      containers:
+      - name: app
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        command:
+        - "sleep"
+        - "3600"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
+      
