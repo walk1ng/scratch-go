@@ -224,10 +224,32 @@ func ExampleAPI_series() {
 	}
 }
 
+func ExampleAPI_config() {
+	client, err := api.NewClient(api.Config{
+		Address: address,
+	})
+	if err != nil {
+		fmt.Printf("Error creating client: %v\n", err)
+		os.Exit(1)
+	}
+
+	v1api := v1.NewAPI(client)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+	result, err := v1api.Config(ctx)
+	if err != nil {
+		fmt.Printf("Error getting Prometheus config: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Println("Result:")
+	fmt.Println(result.YAML)
+}
+
 func main() {
 	// ExampleAPI_query()
 	// ExampleAPI_queryRange()
 	// ExampleAPI_queryRangeWithBasicAuth()
 	// ExampleAPI_queryRangeWithAuthBearerToken()
-	ExampleAPI_series()
+	// ExampleAPI_series()
+	ExampleAPI_config()
 }
