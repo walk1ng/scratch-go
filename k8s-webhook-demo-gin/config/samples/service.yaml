@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: admission-webhook
+  namespace: dev
+  labels:
+    app: admission-webhook
+spec:
+  type: ClusterIP
+  selector:
+    app: admission-webhook
+  ports:
+  - name: https
+    port: 443
+    targetPort: 4443

@@ -1,0 +1,6 @@
+containers:
+  - name: nginx-sidecar
+    image: nginx:latest
+    imagePullPolicy: IfNotPresent
+    ports:
+    - containerPort: 8080

@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test1
+  namespace: dev
+  labels:
+    app: test1
+    dev.walk1ng.io/replicas.validate.required: "y"
+    dev.walk1ng.io/sidecar.inject.required: "y"
+spec:
+  replicas: 3
+  minReadySeconds: 10
+  selector:
+    matchLabels:
+      app: test1
+  template:
+    metadata:
+      labels:
+        app: test1
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: ubuntu-dt-04
+      containers:
+      - name: app
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        command:
+        - "sleep"
+        - "3600"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
+      
