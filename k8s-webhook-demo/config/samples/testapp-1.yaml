@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test
+  namespace: dev
+  labels:
+    app: test
+spec:
+  replicas: 3
+  minReadySeconds: 10
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: ubuntu-dt-04
+      containers: []
+      
