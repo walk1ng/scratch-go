@@ -1,0 +1,8 @@
+apiVersion: webapp.walk1ng.dev/v1
+kind: Company
+metadata:
+  name: intel
+spec:
+  # Add fields here
+  city: chengdu
+  address: qinyang street

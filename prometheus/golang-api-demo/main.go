@@ -43,7 +43,7 @@ func ExampleAPI_query() {
 	v1api := v1.NewAPI(client)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	result, warnings, err := v1api.Query(ctx, "up", time.Now())
+	result, warnings, err := v1api.Query(ctx, "sum(container_memory_working_set_bytes{namespace=\"zvos-system\",container!=\"\", image!=\"\",pod=~\"zvos-rdp-mdw-service.*\"})/1024/1024", time.Now())
 	if err != nil {
 		fmt.Printf("Error querying Prometheus: %v\n", err)
 		os.Exit(1)
@@ -246,10 +246,10 @@ func ExampleAPI_config() {
 }
 
 func main() {
-	// ExampleAPI_query()
+	ExampleAPI_query()
 	// ExampleAPI_queryRange()
 	// ExampleAPI_queryRangeWithBasicAuth()
 	// ExampleAPI_queryRangeWithAuthBearerToken()
 	// ExampleAPI_series()
-	ExampleAPI_config()
+	// ExampleAPI_config()
 }

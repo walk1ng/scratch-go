@@ -2,6 +2,8 @@ apiVersion: webapp.walk1ng.dev/v1
 kind: Company
 metadata:
   name: microsoft
+  labels:
+    state: us
 spec:
   # Add fields here
   city: shanghai
