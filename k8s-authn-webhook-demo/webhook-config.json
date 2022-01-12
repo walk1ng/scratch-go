@@ -1,0 +1,31 @@
+{
+  "kind": "Config",
+  "apiVersion": "v1",
+  "preferences": {},
+  "clusters": [
+    {
+      "name": "mock-authn",
+      "cluster": {
+        "server": "http://10.33.3.101:3000/authenticate"
+      }
+    }
+  ],
+  "users": [
+    {
+      "name": "authn-apiserver",
+      "user": {
+        "token": "secret101"
+      }
+    }
+  ],
+  "contexts": [
+    {
+      "name": "webhook",
+      "context": {
+        "cluster": "mock-authn",
+        "user": "authn-apiserver"
+      }
+    }
+  ],
+  "current-context": "webhook"
+}
