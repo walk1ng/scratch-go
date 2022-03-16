@@ -8,6 +8,7 @@ require (
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.12.1
+	github.com/prometheus/common v0.32.1
 	github.com/spf13/viper v1.4.0
 	go.uber.org/zap v1.15.0
 	k8s.io/api v0.22.5

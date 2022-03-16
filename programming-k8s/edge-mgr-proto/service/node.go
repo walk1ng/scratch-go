@@ -5,10 +5,12 @@ import (
 	"edge-mgr-proto/pkg/informers"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
 )
 
 type NodeService interface {
 	Get(name string) (*corev1.Node, error)
+	List() ([]*corev1.Node, error)
 }
 
 type nodeService struct {
@@ -25,4 +27,8 @@ func newNodeService(informers informers.Informer, kubeClient *client.Client) *no
 
 func (svc *nodeService) Get(name string) (*corev1.Node, error) {
 	return svc.Informers.CoreV1().Nodes().Lister().Get(name)
+}
+
+func (svc *nodeService) List() ([]*corev1.Node, error) {
+	return svc.Informers.CoreV1().Nodes().Lister().List(labels.Everything())
 }

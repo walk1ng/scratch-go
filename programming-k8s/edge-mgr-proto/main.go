@@ -14,6 +14,7 @@ import (
 
 	"edge-mgr-proto/pkg/client"
 	"edge-mgr-proto/pkg/informers"
+	"edge-mgr-proto/pkg/prometheus"
 
 	"go.uber.org/zap"
 	"k8s.io/client-go/rest"
@@ -48,7 +49,7 @@ func main() {
 	if err != nil {
 		config, err = rest.InClusterConfig()
 		if err != nil {
-			panic(err)
+			zap.L().Panic("failed to get access to k8s cluster", zap.Error(err))
 		}
 	}
 
@@ -68,13 +69,18 @@ func main() {
 	stopper := make(chan struct{})
 	informers.KubeInformer.Run(stopper)
 
+	// init prometheus api
+	if err := prometheus.Init(); err != nil {
+		zap.L().Panic("failed to init prometheus api", zap.Error(err))
+	}
+
 	// init channels
 	common.WorkChan = &mq.WorkChannel{
 		Queue: make(chan mq.Message, 10),
 	}
 
 	// init service
-	if err := service.Init(common.WorkChan, informers.KubeInformer, client.KubeClient); err != nil {
+	if err := service.Init(common.WorkChan, informers.KubeInformer, client.KubeClient, prometheus.PromV1API); err != nil {
 		zap.L().Panic("failed to init service", zap.Error(err))
 	}
 

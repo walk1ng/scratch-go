@@ -3,6 +3,7 @@ package service
 import (
 	"edge-mgr-proto/pkg/client"
 	"edge-mgr-proto/pkg/informers"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -10,7 +11,7 @@ import (
 
 type ClusterService interface {
 	GetClusterNodes() ([]*corev1.Node, error)
-	GetNodeIPList() ([]string, error)
+	GetNodeList() ([]string, error)
 }
 
 type clusterService struct {
@@ -26,22 +27,22 @@ func newClusterService(informers informers.Informer, kubeClient *client.Client) 
 }
 
 func (svc *clusterService) GetClusterNodes() ([]*corev1.Node, error) {
-	return svc.Informers.CoreV1().Nodes().Lister().List(labels.Nothing())
+	return svc.Informers.CoreV1().Nodes().Lister().List(labels.Everything())
 }
 
-func (svc *clusterService) GetNodeIPList() ([]string, error) {
+func (svc *clusterService) GetNodeList() ([]string, error) {
 	nodes, err := svc.GetClusterNodes()
 	if err != nil {
 		return []string{}, err
 	}
 
-	nodeIPList := make([]string, len(nodes))
-	for _, node := range nodes {
-		for _, addr := range node.Status.Addresses {
-			if addr.Type == corev1.NodeExternalIP {
-				nodeIPList = append(nodeIPList, addr.Address)
-			}
-		}
+	fmt.Println("len of nodes:", len(nodes))
+
+	nodeList := make([]string, len(nodes))
+	for i, node := range nodes {
+		fmt.Println(node.Name)
+		nodeList[i] = node.Name
 	}
-	return nodeIPList, nil
+	fmt.Println(nodeList)
+	return nodeList, nil
 }
