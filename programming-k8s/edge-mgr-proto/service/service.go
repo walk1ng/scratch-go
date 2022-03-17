@@ -12,6 +12,7 @@ var Svc Service
 
 type Service interface {
 	// k8s
+	Pod() PodService
 	Deployment() DeploymentService
 	ConfigMap() ConfigMapService
 	Node() NodeService
@@ -39,6 +40,10 @@ func newEdgeMgrService(ch *mq.WorkChannel, informers informers.Informer, kubeCli
 		KubeClient:    kubeClient,
 		PrometheusAPI: promAPI,
 	}
+}
+
+func (svc *EdgeMgrService) Pod() PodService {
+	return newPodService(svc.Informers, svc.KubeClient)
 }
 
 func (svc *EdgeMgrService) Deployment() DeploymentService {

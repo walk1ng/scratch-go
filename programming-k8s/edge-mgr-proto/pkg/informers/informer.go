@@ -62,6 +62,9 @@ func Init(config *rest.Config) error {
 	// reigster node informer in sharedInformerFactory
 	KubeInformer.CoreV1().Nodes().Informer()
 
+	// register pod informer in sharedInformerFactory
+	KubeInformer.CoreV1().Pods().Informer()
+
 	return nil
 }
 

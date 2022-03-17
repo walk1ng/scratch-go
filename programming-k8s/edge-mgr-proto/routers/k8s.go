@@ -11,7 +11,7 @@ func initK8sRouter(g *gin.RouterGroup) {
 	{
 		// cluster
 		k8sGroup.GET("/cluster/overview", controller.GetClusterOverview)
-		k8sGroup.GET("/cluster/node", controller.GetClusterNodes)
+		k8sGroup.POST("/cluster/node", controller.GetClusterNodesOverview)
 
 		// node
 		k8sGroup.GET("/nodes", controller.GetNodes)
