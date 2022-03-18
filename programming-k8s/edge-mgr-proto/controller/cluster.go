@@ -5,16 +5,8 @@ import (
 	"edge-mgr-proto/service"
 
 	"github.com/gin-gonic/gin"
+	"k8s.io/apimachinery/pkg/labels"
 )
-
-// func GetClusterNodes(c *gin.Context) {
-// 	nodeList := service.Svc.Cluster().GetNodeList()
-// 	if err != nil {
-// 		ResponseErrorWithMsg(c, CodeK8sGetFailure, err)
-// 		return
-// 	}
-// 	ResponseSuccess(c, service.Svc.Prometheus().GetClusterCpuUsage(nodeList))
-// }
 
 func GetClusterOverview(c *gin.Context) {
 	// nodes in cluster
@@ -54,15 +46,15 @@ func GetClusterOverview(c *gin.Context) {
 
 	overview := &models.ClusterOverviewResponse{
 		KubernetesVersion: service.Svc.Cluster().Version(masters[0]),
-		Status:            string(service.Svc.Cluster().Status()),
+		Status:            service.Svc.Cluster().Status(),
 		PodCapacity:       service.Svc.Cluster().PodCapacity(masters[0]),
-		Pods:              uint(len(pods)),
-		Nodes:             uint(len(nodes)),
-		NodeList:          nodeList,
-		Masters:           uint(len(masters)),
-		MasterList:        masterList,
-		Workers:           uint(len(workers)),
-		WorkerList:        workerList,
+		PodCount:          uint(len(pods)),
+		NodeCount:         uint(len(nodes)),
+		Nodes:             nodeList,
+		MasterCount:       uint(len(masters)),
+		Masters:           masterList,
+		WorkerCount:       uint(len(workers)),
+		Workers:           workerList,
 		CpuTotal:          float64(clusterCpuUsage["total"]),
 		CpuUsed:           float64(clusterCpuUsage["used"]),
 		MemoryBytesTotal:  float64(clusterMemUsage["total_bytes"]),
@@ -75,8 +67,8 @@ func GetClusterOverview(c *gin.Context) {
 }
 
 func GetClusterNodesOverview(c *gin.Context) {
-	var req *models.ClusterNodesRequest
-	if err := c.ShouldBindJSON(req); err != nil {
+	var req models.ClusterNodesRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		ResponseErrorWithMsg(c, CodeInvalidParam, err)
 		return
 	}
@@ -86,11 +78,39 @@ func GetClusterNodesOverview(c *gin.Context) {
 		return
 	}
 
-	overview := &models.ClusterNodesResponse{}
-	overview.Count = uint(len(req.Nodes))
-
-	for _, node := range req.Nodes {
-
+	resp := &models.ClusterNodesResponse{
+		Count: 0,
+		Nodes: make([]*models.ClusterNodeOverview, len(req.Nodes)),
 	}
 
+	for i, nodeName := range req.Nodes {
+		_, err := service.Svc.Node().Get(nodeName)
+		resp.Nodes[i] = &models.ClusterNodeOverview{
+			Name:   nodeName,
+			Status: service.Svc.Node().Status(nodeName),
+		}
+		if err != nil {
+			continue
+		}
+
+		// pods
+		pods, err := service.Svc.Pod().ListByNode(nodeName, labels.Everything())
+		if err == nil {
+			resp.Nodes[i].PodCount = uint(len(pods))
+		}
+
+		// metrics
+		cpuUsage := service.Svc.Prometheus().GetNodeCpuUsage(nodeName)
+		memUsage := service.Svc.Prometheus().GetNodeMemoryUsage(nodeName)
+		diskUsage := service.Svc.Prometheus().GetNodeDiskUsage(nodeName)
+		diskIOUsage := service.Svc.Prometheus().GetNodeDiskIOUsage(nodeName)
+		resp.Nodes[i].CpuUsage = float64(cpuUsage)
+		resp.Nodes[i].MemoryUsage = float64(memUsage)
+		resp.Nodes[i].DiskUsage = float64(diskUsage)
+		resp.Nodes[i].DiskIOUsage = float64(diskIOUsage)
+	}
+
+	resp.Count = uint(len(req.Nodes))
+
+	ResponseSuccess(c, resp)
 }

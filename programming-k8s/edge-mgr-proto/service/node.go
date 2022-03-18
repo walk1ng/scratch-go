@@ -3,22 +3,16 @@ package service
 import (
 	"edge-mgr-proto/pkg/client"
 	"edge-mgr-proto/pkg/informers"
+	"edge-mgr-proto/types"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
-)
-
-type NodeConditionStatus string
-
-const (
-	NodeStatusReady    NodeConditionStatus = "ready"
-	NodeStatusNotReady NodeConditionStatus = "not_ready"
-	NodeStatusUnknown  NodeConditionStatus = "unknown"
 )
 
 type NodeService interface {
 	Get(name string) (*corev1.Node, error)
-	Status(*corev1.Node) NodeConditionStatus
+	Status(name string) types.NodeConditionStatus
 	_list(selector labels.Selector) ([]*corev1.Node, error)
 	ListAll() ([]*corev1.Node, error)
 	MasterNodes() ([]*corev1.Node, error)
@@ -41,18 +35,26 @@ func (svc *nodeService) Get(name string) (*corev1.Node, error) {
 	return svc.Informers.CoreV1().Nodes().Lister().Get(name)
 }
 
-func (svc *nodeService) Status(node *corev1.Node) NodeConditionStatus {
+func (svc *nodeService) Status(name string) types.NodeConditionStatus {
+	node, err := svc.Get(name)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return types.NodeStatusNotExist
+		}
+		return types.NodeStatusUnknown
+	}
+
 	for _, condition := range node.Status.Conditions {
 		if condition.Type != corev1.NodeReady {
 			continue
 		}
 		if condition.Status == corev1.ConditionTrue {
-			return NodeStatusReady
+			return types.NodeStatusReady
 		}
-		return NodeStatusNotReady
+		return types.NodeStatusNotReady
 	}
 
-	return NodeStatusUnknown
+	return types.NodeStatusUnknown
 }
 
 func (svc *nodeService) _list(selector labels.Selector) ([]*corev1.Node, error) {

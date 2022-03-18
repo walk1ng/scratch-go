@@ -15,11 +15,15 @@ import (
 
 type PrometheusService interface {
 	GetClusterCpuUsage(nodeList []string) map[string]model.SampleValue
-	GetClusterCpuUsageRange(nodeList []string)
+	// GetClusterCpuUsageRange(nodeList []string)
 	GetClusterMemoryUsage(nodeList []string) map[string]model.SampleValue
-	GetClusterMemoryUsageRange(nodeList []string)
+	// GetClusterMemoryUsageRange(nodeList []string)
 	GetClusterDiskUsage(nodeList []string) map[string]model.SampleValue
-	GetClusterDiskUsageRange(nodeList []string)
+	// GetClusterDiskUsageRange(nodeList []string)
+	GetNodeCpuUsage(node string) model.SampleValue
+	GetNodeMemoryUsage(node string) model.SampleValue
+	GetNodeDiskUsage(node string) model.SampleValue
+	GetNodeDiskIOUsage(node string) model.SampleValue
 }
 
 type prometheusService struct {
@@ -49,9 +53,9 @@ func (svc *prometheusService) GetClusterCpuUsage(nodeList []string) map[string]m
 
 }
 
-func (svc *prometheusService) GetClusterCpuUsageRange(nodeList []string) {
+/* func (svc *prometheusService) GetClusterCpuUsageRange(nodeList []string) {
 	panic("not implement")
-}
+} */
 
 func (svc *prometheusService) GetClusterMemoryUsage(nodeList []string) map[string]model.SampleValue {
 	instances := strings.Join(nodeList, "|")
@@ -70,9 +74,9 @@ func (svc *prometheusService) GetClusterMemoryUsage(nodeList []string) map[strin
 
 }
 
-func (svc *prometheusService) GetClusterMemoryUsageRange(nodeList []string) {
+/* func (svc *prometheusService) GetClusterMemoryUsageRange(nodeList []string) {
 	panic("not implement")
-}
+} */
 
 func (svc *prometheusService) GetClusterDiskUsage(nodeList []string) map[string]model.SampleValue {
 	// TODO
@@ -92,8 +96,32 @@ func (svc *prometheusService) GetClusterDiskUsage(nodeList []string) map[string]
 	panic("not implement")
 }
 
-func (svc *prometheusService) GetClusterDiskUsageRange(nodeList []string) {
+/* func (svc *prometheusService) GetClusterDiskUsageRange(nodeList []string) {
 	panic("not implement")
+} */
+
+func (svc *prometheusService) GetNodeCpuUsage(node string) model.SampleValue {
+	nodeCpuUsageQuery := fmt.Sprintf(conf.QueryNodeCpuUsage, node, node)
+	usage := svc.query(context.Background(), nodeCpuUsageQuery)
+	return getFirstValue(usage)
+}
+
+func (svc *prometheusService) GetNodeMemoryUsage(node string) model.SampleValue {
+	nodeMemUsageQuery := fmt.Sprintf(conf.QueryNodeMemoryUsage, node, node, node, node, node, node)
+	usage := svc.query(context.Background(), nodeMemUsageQuery)
+	return getFirstValue(usage)
+}
+
+func (svc *prometheusService) GetNodeDiskUsage(node string) model.SampleValue {
+	nodeDiskUsageQuery := fmt.Sprintf(conf.QueryNodeDiskUsage, node, node)
+	usage := svc.query(context.Background(), nodeDiskUsageQuery)
+	return getFirstValue(usage)
+}
+
+func (svc *prometheusService) GetNodeDiskIOUsage(node string) model.SampleValue {
+	nodeDiskIOUsageQuery := fmt.Sprintf(conf.QueryNodeDiskIOUsage, node)
+	usage := svc.query(context.Background(), nodeDiskIOUsageQuery)
+	return getFirstValue(usage)
 }
 
 func (svc *prometheusService) query(c context.Context, q string) model.Value {
@@ -101,7 +129,6 @@ func (svc *prometheusService) query(c context.Context, q string) model.Value {
 	ctx, cancel := context.WithTimeout(c, 10*time.Second)
 	defer cancel()
 
-	// used
 	result, warnings, err := svc.Query(ctx, q, time.Now())
 	if err != nil {
 		fmt.Printf("Error querying Prometheus: %v\n", err)
@@ -110,11 +137,21 @@ func (svc *prometheusService) query(c context.Context, q string) model.Value {
 	if len(warnings) > 0 {
 		fmt.Printf("Warnings: %v\n", warnings)
 	}
-	fmt.Printf("Result:\n%v\n", result)
+	fmt.Printf("Result:\n%+v\n", result)
 
 	return result
 }
 
 func (svc *prometheusService) queryRange(c context.Context, q, start, end, step string) {
 	panic("not implement")
+}
+
+func getFirstValue(in model.Value) model.SampleValue {
+	// vector
+	iin := in.(model.Vector)
+	if iin.Len() == 0 {
+		println("oh no")
+		return 0
+	}
+	return iin[0].Value
 }
