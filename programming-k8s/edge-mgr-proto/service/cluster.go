@@ -4,7 +4,6 @@ import (
 	"edge-mgr-proto/pkg/client"
 	"edge-mgr-proto/pkg/informers"
 	"edge-mgr-proto/types"
-	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
 )
@@ -42,13 +41,9 @@ func (svc *clusterService) PodCapacity(master *corev1.Node) uint {
 }
 
 func (svc *clusterService) GetNodeList(nodes []*corev1.Node) []string {
-	fmt.Println("len of nodes:", len(nodes))
-
 	nodeList := make([]string, len(nodes))
 	for i, node := range nodes {
-		fmt.Println(node.Name)
 		nodeList[i] = node.Name
 	}
-	fmt.Println(nodeList)
 	return nodeList
 }

@@ -34,18 +34,3 @@ type ClusterOverviewResponse struct {
 	DiskBytesTotal    float64             `json:"diskBytesTotal"`
 	DiskBytesUsed     float64             `json:"diskBytesUsed"`
 }
-
-type ClusterNodesResponse struct {
-	Count uint                   `json:"count"`
-	Nodes []*ClusterNodeOverview `json:"nodes"`
-}
-
-type ClusterNodeOverview struct {
-	Name        string                    `json:"hostnameOrIP"`
-	Status      types.NodeConditionStatus `json:"status"`
-	PodCount    uint                      `json:"podCount"`
-	CpuUsage    float64                   `json:"cpuUsage"`
-	MemoryUsage float64                   `json:"memoryUsage"`
-	DiskUsage   float64                   `json:"diskUsage"`
-	DiskIOUsage float64                   `json:"diskIOUsage"`
-}

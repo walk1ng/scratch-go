@@ -4,9 +4,11 @@ import (
 	"edge-mgr-proto/pkg/client"
 	"edge-mgr-proto/pkg/informers"
 	"edge-mgr-proto/types"
+	"fmt"
 
+	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/errors"
+	kerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 )
 
@@ -17,6 +19,8 @@ type NodeService interface {
 	ListAll() ([]*corev1.Node, error)
 	MasterNodes() ([]*corev1.Node, error)
 	WorkerNodes() ([]*corev1.Node, error)
+	GetNodeHostname(name string) (string, error)
+	GetNodeInternalIP(name string) (string, error)
 }
 
 type nodeService struct {
@@ -38,7 +42,7 @@ func (svc *nodeService) Get(name string) (*corev1.Node, error) {
 func (svc *nodeService) Status(name string) types.NodeConditionStatus {
 	node, err := svc.Get(name)
 	if err != nil {
-		if errors.IsNotFound(err) {
+		if kerrors.IsNotFound(err) {
 			return types.NodeStatusNotExist
 		}
 		return types.NodeStatusUnknown
@@ -111,4 +115,34 @@ func (svc *nodeService) WorkerNodes() ([]*corev1.Node, error) {
 	}
 
 	return ret, nil
+}
+
+func (svc *nodeService) GetNodeHostname(name string) (string, error) {
+	node, err := svc.Get(name)
+	if err != nil {
+		return "", err
+	}
+
+	for _, addr := range node.Status.Addresses {
+		if addr.Type == corev1.NodeHostName {
+			return addr.Address, nil
+		}
+	}
+
+	return "", errors.New(fmt.Sprintf("%s type address not found", corev1.NodeHostName))
+}
+
+func (svc *nodeService) GetNodeInternalIP(name string) (string, error) {
+	node, err := svc.Get(name)
+	if err != nil {
+		return "", err
+	}
+
+	for _, addr := range node.Status.Addresses {
+		if addr.Type == corev1.NodeInternalIP {
+			return addr.Address, nil
+		}
+	}
+
+	return "", errors.New(fmt.Sprintf("%s type address not found", corev1.NodeInternalIP))
 }

@@ -3,6 +3,10 @@ package conf
 const (
 	DISK_FSTYPE = "ext[234]|btrfs|xfs|zfs"
 
+	/*
+		Cluster metrics
+	*/
+
 	// cluster cpu
 	QueryClusterCpuUsed  = `sum(irate(node_cpu_seconds_total{job="node-exporter", mode!="idle", instance=~"%s"}[5m]))`
 	QueryClusterCpuCount = `sum(count without(cpu, mode) (node_cpu_seconds_total{job="node-exporter", mode="idle", instance=~"%s"}))`
@@ -16,10 +20,13 @@ const (
 	sum(node_memory_Shmem_bytes{job="node-exporter", instance=~"%s"})`
 
 	// cluster disk
-	// TODO
-	QueryClusterDiskTotal = `sum(node_filesystem_size_bytes{job="node-exporter", instance=~"%s", fstype=~"{ DISK_FSTYPE }", mountpoint=~"{ DISK_MOUNTPOINT }"}})`
-	QueryClusterDiskUsed  = `sum(node_filesystem_size_bytes{{cluster_id="{cluster_id}", job="node-exporter", instance=~"{node_ip_list}", fstype=~"{ DISK_FSTYPE }", mountpoint=~"{ DISK_MOUNTPOINT }"}}) - sum(node_filesystem_free_bytes{{cluster_id="{cluster_id}", job="node-exporter", instance=~"{node_ip_list}", fstype=~"{ DISK_FSTYPE }", mountpoint=~"{ DISK_MOUNTPOINT }"}})`
+	QueryClusterDiskTotal = `sum(node_filesystem_size_bytes{job="node-exporter", instance=~"%s", fstype!="", mountpoint="/"})`
+	QueryClusterDiskUsed  = `sum(node_filesystem_size_bytes{job="node-exporter", instance=~"%s", fstype!="", mountpoint="/"}) -
+	sum(node_filesystem_free_bytes{job="node-exporter", instance=~"%s", fstype!="", mountpoint="/"})`
 
+	/*
+		Node metrics
+	*/
 	// node cpu usage
 	QueryNodeCpuUsage = `sum(irate(node_cpu_seconds_total{job="node-exporter", mode!="idle", instance="%s"}[3m])) / sum(count without(cpu, mode) (node_cpu_seconds_total{job="node-exporter", mode="idle", instance="%s"})) * 100`
 
