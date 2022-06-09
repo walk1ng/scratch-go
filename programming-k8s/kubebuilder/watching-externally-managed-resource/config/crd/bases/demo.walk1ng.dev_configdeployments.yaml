@@ -12,6 +12,8 @@ spec:
     kind: ConfigDeployment
     listKind: ConfigDeploymentList
     plural: configdeployments
+    shortNames:
+    - cfd
     singular: configdeployment
   scope: Namespaced
   versions:
@@ -35,9 +37,7 @@ spec:
           spec:
             description: ConfigDeploymentSpec defines the desired state of ConfigDeployment
             properties:
-              foo:
-                description: Foo is an example field of ConfigDeployment. Edit configdeployment_types.go
-                  to remove/update
+              configMap:
                 type: string
             type: object
           status:

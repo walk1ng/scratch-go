@@ -28,8 +28,8 @@ type ConfigDeploymentSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of ConfigDeployment. Edit configdeployment_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// +optional
+	ConfigMap string `json:"configMap,omitempty"`
 }
 
 // ConfigDeploymentStatus defines the observed state of ConfigDeployment
@@ -40,6 +40,7 @@ type ConfigDeploymentStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:resource:shortName={"cfd"}
 
 // ConfigDeployment is the Schema for the configdeployments API
 type ConfigDeployment struct {

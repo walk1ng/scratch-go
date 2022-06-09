@@ -1,0 +1,2 @@
+By default, Kubebuilder and the Controller Runtime libraries allow for controllers to easily watch the resources that they manage as well as dependent resources that are Owned by the controller. 
+However, those are not always the only resources that need to be watched in the cluster.
