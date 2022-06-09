@@ -1,0 +1,16 @@
+domain: walk1ng.dev
+layout:
+- go.kubebuilder.io/v3
+projectName: watching-externally-managed-resource
+repo: watch-external-res
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: walk1ng.dev
+  group: demo
+  kind: ConfigDeployment
+  path: watch-external-res/api/v1
+  version: v1
+version: "3"
